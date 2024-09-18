@@ -1,67 +1,56 @@
-//your JS code here. If required.
-document.addEventListener('DOMContentLoaded', () => {
-    const player1Input = document.getElementById('player1');
-    const player2Input = document.getElementById('player2');
-    const submitButton = document.getElementById('submit');
-    const gameDiv = document.getElementById('game');
+document.getElementById('submit').addEventListener('click', function() {
+    const player1 = document.getElementById('player-1').value;
+    const player2 = document.getElementById('player-2').value;
+
+    if (player1 === "" || player2 === "") {
+        alert("Please enter names for both players.");
+        return;
+    }
+
+    let currentPlayer = player1;
+    let currentMarker = 'X';
+    let gameActive = true;
+    const boardState = ["", "", "", "", "", "", "", "", ""];
     const messageDiv = document.querySelector('.message');
-    let currentPlayer = 'x';
-    let player1 = '';
-    let player2 = '';
-    let board = ['', '', '', '', '', '', '', '', ''];
+    const cells = document.querySelectorAll('.board div');
 
-    const cells = document.querySelectorAll('.cell');
-
-    submitButton.addEventListener('click', () => {
-        player1 = player1Input.value;
-        player2 = player2Input.value;
-
-        if (player1 && player2) {
-            document.getElementById('setup').style.display = 'none';
-            gameDiv.style.display = 'block';
-            updateMessage();
-        }
-    });
+    messageDiv.textContent = `${currentPlayer}, you're up!`;
 
     cells.forEach(cell => {
-        cell.addEventListener('click', () => {
-            const index = cell.id - 1;
+        cell.textContent = "";
+        cell.addEventListener('click', function() {
+            const cellIndex = parseInt(cell.id) - 1;
 
-            if (board[index] === '') {
-                board[index] = currentPlayer;
-                cell.textContent = currentPlayer;
-                if (checkWin()) {
-                    messageDiv.textContent = `${currentPlayer === 'x' ? player1 : player2} congratulations you won!`;
-                    cells.forEach(c => c.removeEventListener('click', handleClick));
-                } else if (board.every(cell => cell !== '')) {
-                    messageDiv.textContent = 'It\'s a draw!';
-                } else {
-                    currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
-                    updateMessage();
-                }
+            if (boardState[cellIndex] !== "" || !gameActive) {
+                return;
             }
-        });
+
+            boardState[cellIndex] = currentMarker;
+            cell.textContent = currentMarker;
+
+            if (checkWinner(boardState, currentMarker)) {
+                messageDiv.textContent = `${currentPlayer}, congratulations you won!`;
+                gameActive = false;
+            } else if (!boardState.includes("")) {
+                messageDiv.textContent = "It's a tie!";
+                gameActive = false;
+            } else {
+                currentPlayer = currentPlayer === player1 ? player2 : player1;
+                currentMarker = currentMarker === 'X' ? 'O' : 'X';
+                messageDiv.textContent = `${currentPlayer}, you're up!`;
+            }
+        }, { once: true });
     });
-
-    function updateMessage() {
-        messageDiv.textContent = `${currentPlayer === 'x' ? player1 : player2}, you're up`;
-    }
-
-    function checkWin() {
-        const winPatterns = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-
-        return winPatterns.some(pattern => {
-            const [a, b, c] = pattern;
-            return board[a] && board[a] === board[b] && board[a] === board[c];
-        });
-    }
 });
+
+function checkWinner(boardState, currentMarker) {
+    const winningCombos = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+        [0, 4, 8], [2, 4, 6]             // diagonals
+    ];
+
+    return winningCombos.some(combo => 
+        combo.every(index => boardState[index] === currentMarker)
+    );
+}
