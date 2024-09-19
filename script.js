@@ -1,18 +1,22 @@
 document.getElementById('submit').addEventListener('click', function() {
-    const player1 = document.getElementById('player1').value;
+    
+	const player1 = document.getElementById('player1').value;
     const player2 = document.getElementById('player2').value;
-
+	
     if (player1 === "" || player2 === "") {
         alert("Please enter names for both players.");
         return;
     }
 
+	document.getElementById("starter").style.display = "none";
+	document.getElementById("board").style.display = "block";
+	
     let currentPlayer = player1;
     let currentMarker = 'X';
     let gameActive = true;
     const boardState = ["", "", "", "", "", "", "", "", ""];
     const messageDiv = document.querySelector('.message');
-    const cells = document.querySelectorAll('.board div');
+    const cells = document.querySelectorAll('.row div');
 
     messageDiv.textContent = `${currentPlayer}, you're up!`;
 
@@ -45,9 +49,9 @@ document.getElementById('submit').addEventListener('click', function() {
 
 function checkWinner(boardState, currentMarker) {
     const winningCombos = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-        [0, 4, 8], [2, 4, 6]             // diagonals
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
     ];
 
     return winningCombos.some(combo => 
